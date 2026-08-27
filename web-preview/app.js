@@ -141,6 +141,9 @@ function setupNavigation() {
 function switchScreen(screenName) {
   activeScreen = screenName;
 
+  // Toggle auth-mode layout to hide sidebar and center login screen
+  document.body.classList.toggle('auth-mode', screenName === 'auth');
+
   // Toggle screen views
   document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
   const target = document.getElementById(`screen-${screenName}`);
@@ -157,7 +160,8 @@ function switchScreen(screenName) {
   });
 
   // Scroll to top
-  document.getElementById('main-content').scrollTo(0, 0);
+  const mainC = document.getElementById('main-content');
+  if (mainC) mainC.scrollTo(0, 0);
 }
 
 // ══════════════ VERIFY TABS ══════════════
@@ -271,21 +275,12 @@ async function loadUserData() {
       // Fallback
     }
   } else {
-    // Default demo user for seamless first load
-    try {
-      const res = await fetch(`${API_BASE}/auth/demo-switch`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'user', name: 'Aditi Sharma', email: 'aditi@example.com' }),
-      });
-      const data = await res.json();
-      if (data.data?.token) {
-        currentToken = data.data.token;
-        currentUser = data.data.user || { name: 'Aditi Sharma', email: 'aditi@example.com', role: 'user' };
-        currentRole = 'user';
-        updateUserUI(currentUser);
-      }
-    } catch {}
+    // When not logged in, prompt user with dedicated Auth / Login screen
+    currentToken = '';
+    currentUser = null;
+    currentRole = 'user';
+    updateUserUI(null);
+    switchScreen('auth');
   }
 }
 

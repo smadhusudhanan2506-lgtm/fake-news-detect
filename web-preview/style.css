@@ -284,6 +284,44 @@ body.light-theme {
   color: white;
 }
 
+/* ──────── Auth Mode (Hides Sidebar & Centers Auth Page) ──────── */
+body.auth-mode .sidebar {
+  display: none !important;
+}
+body.auth-mode .hamburger-btn {
+  display: none !important;
+}
+body.auth-mode .bottom-nav {
+  display: none !important;
+}
+body.auth-mode .header-user-badge {
+  display: none !important;
+}
+body.auth-mode .app-shell {
+  display: block !important;
+  height: calc(100vh - var(--header-h));
+}
+body.auth-mode .main-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: calc(100vh - var(--header-h)) !important;
+  padding: 24px 16px !important;
+}
+body.auth-mode #screen-auth {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+body.auth-mode .auth-page-card {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 /* ══════════════════════════════════════════
    APP SHELL — Sidebar + Main Layout
    ══════════════════════════════════════════ */
