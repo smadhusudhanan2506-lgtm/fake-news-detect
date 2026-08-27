@@ -102,16 +102,15 @@ export const setupChatWebSocket = (io: SocketIOServer) => {
           const words = fullContent.split(' ');
           let streamedSoFar = '';
 
-          for (let i = 0; i < words.length; i += 3) {
-            const chunk = words.slice(i, i + 3).join(' ') + ' ';
+          for (let i = 0; i < words.length; i += 6) {
+            const chunk = words.slice(i, i + 6).join(' ') + ' ';
             streamedSoFar += chunk;
             socket.emit('response_chunk', {
               chunk,
               fullContent: streamedSoFar,
               conversationId: activeConv._id,
             });
-            // Small async pause to stream naturally
-            await new Promise((resolve) => setTimeout(resolve, 30));
+            await new Promise((resolve) => setTimeout(resolve, 10));
           }
 
           // Complete event
