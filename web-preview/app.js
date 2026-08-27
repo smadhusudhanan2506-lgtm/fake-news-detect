@@ -200,18 +200,38 @@ function setupVerifyTabs() {
 function setupSamplePresets() {
   document.querySelectorAll('.preset-chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      document.getElementById('verify-text-input').value = chip.getAttribute('data-sample');
+      const sample = chip.getAttribute('data-sample');
+      if (sample.startsWith('http://') || sample.startsWith('https://')) {
+        const urlTab = document.querySelector('.v-tab-btn[data-vtab="url"]');
+        if (urlTab) urlTab.click();
+        const urlInput = document.getElementById('verify-url-input');
+        if (urlInput) urlInput.value = sample;
+      } else {
+        const textTab = document.querySelector('.v-tab-btn[data-vtab="text"]');
+        if (textTab) textTab.click();
+        const textInput = document.getElementById('verify-text-input');
+        if (textInput) textInput.value = sample;
+      }
     });
   });
 
   document.getElementById('btn-clear-text').addEventListener('click', () => {
     document.getElementById('verify-text-input').value = '';
+    const urlInp = document.getElementById('verify-url-input');
+    if (urlInp) urlInp.value = '';
   });
 
   document.getElementById('btn-paste-clipboard').addEventListener('click', async () => {
     try {
       const text = await navigator.clipboard.readText();
-      document.getElementById('verify-text-input').value = text;
+      if (text.startsWith('http://') || text.startsWith('https://')) {
+        const urlTab = document.querySelector('.v-tab-btn[data-vtab="url"]');
+        if (urlTab) urlTab.click();
+        const urlInput = document.getElementById('verify-url-input');
+        if (urlInput) urlInput.value = text;
+      } else {
+        document.getElementById('verify-text-input').value = text;
+      }
     } catch {
       document.getElementById('verify-text-input').value =
         'PIB Fact Check debunks Rs 50,000 scholarship cash grant circular.';
@@ -772,14 +792,17 @@ async function runVerification() {
   } else if (inputType === 'url') {
     content = document.getElementById('verify-url-input').value.trim();
     if (!content) {
-      showToast('Please enter a URL or social media link to verify.', 'warning');
+      showToast('Please enter an Instagram Reel, YouTube Shorts, or News URL to verify.', 'warning');
       return;
     }
   } else {
     content = document.getElementById('verify-text-input').value.trim();
     if (!content) {
-      showToast('Please enter content or a claim to verify.', 'warning');
+      showToast('Please enter content, a claim, or a video link to verify.', 'warning');
       return;
+    }
+    if (content.startsWith('http://') || content.startsWith('https://')) {
+      inputType = 'url';
     }
   }
 

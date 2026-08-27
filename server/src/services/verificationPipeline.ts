@@ -40,6 +40,9 @@ export class VerificationPipeline {
     let rawText = options.content;
     let platform = 'text';
 
+    const trimmedContent = (options.content || '').trim();
+    const isUrl = trimmedContent.startsWith('http://') || trimmedContent.startsWith('https://');
+
     if (options.inputType === 'screenshot' || options.inputType === 'image') {
       if (options.imageBuffer) {
         const ocr = await OcrService.extractText(options.imageBuffer);
@@ -48,10 +51,13 @@ export class VerificationPipeline {
     } else if (options.inputType === 'video') {
       const vid = await MediaAnalysisService.processVideo(options.filename || 'video.mp4', options.fileSize || 1024);
       rawText = `${vid.transcribedAudioText}\n${vid.extractedFrameText}`;
-    } else if (options.inputType === 'url' || options.inputType === 'social_media') {
-      const parsedSocial = MediaAnalysisService.parseSocialUrl(options.sourceUrl || options.content);
+    } else if (options.inputType === 'url' || options.inputType === 'social_media' || isUrl) {
+      stagesCompleted.push('Extracting video metadata & captions...');
+      const targetUrl = isUrl ? trimmedContent : (options.sourceUrl || options.content);
+      const parsedSocial = await MediaAnalysisService.parseSocialUrl(targetUrl);
       platform = parsedSocial.platform;
-      rawText = `${parsedSocial.title}: ${parsedSocial.extractedText}`;
+      rawText = parsedSocial.extractedText ? `${parsedSocial.title}. ${parsedSocial.extractedText}` : parsedSocial.title;
+      options.sourceUrl = targetUrl;
     }
 
     // STAGE 2: Claim Extraction & Normalization

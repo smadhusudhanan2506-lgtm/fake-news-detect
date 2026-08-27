@@ -193,11 +193,11 @@
           </div>
 
           <div class="verify-nav-tabs">
-            <button class="v-tab-btn active" data-vtab="text"><i class="fa-solid fa-font"></i> Text</button>
+            <button class="v-tab-btn active" data-vtab="text"><i class="fa-solid fa-font"></i> Text Claim</button>
+            <button class="v-tab-btn" data-vtab="url"><i class="fa-solid fa-play"></i> Reel / Shorts / URL</button>
             <button class="v-tab-btn" data-vtab="whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
-            <button class="v-tab-btn" data-vtab="url"><i class="fa-solid fa-link"></i> Link / URL</button>
             <button class="v-tab-btn" data-vtab="image"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Image & Deepfake</button>
-            <button class="v-tab-btn" data-vtab="video"><i class="fa-solid fa-clapperboard"></i> AI Video & Reel</button>
+            <button class="v-tab-btn" data-vtab="video"><i class="fa-solid fa-clapperboard"></i> AI Video Upload</button>
           </div>
 
           <div class="verify-tab-body">
@@ -220,7 +220,7 @@
             <div class="input-card hidden" id="url-input-container">
               <div class="url-field-wrapper">
                 <i class="fa-solid fa-link"></i>
-                <input type="url" id="verify-url-input" placeholder="https://example.com/news-story or Instagram Reel / YouTube / X link...">
+                <input type="url" id="verify-url-input" placeholder="Paste Instagram Reel, YouTube Shorts, TikTok, or News URL (e.g. https://www.instagram.com/reel/...)...">
               </div>
             </div>
 
@@ -240,8 +240,8 @@
             <div class="sample-presets">
               <span class="preset-label"><i class="fa-solid fa-bolt"></i> Try Sample Claims:</span>
               <div class="preset-chips">
+                <button class="preset-chip" data-sample="https://www.youtube.com/shorts/sample_viral_scholarship_scheme">Viral Reel / Shorts URL</button>
                 <button class="preset-chip" data-sample="Breaking: Government announces Rs 50,000 direct cash grant for all students from next month.">Scholarship Scheme (False)</button>
-                <button class="preset-chip" data-sample="Class 10 and 12 Board Exams scrapped entirely nationwide under new education guidelines.">Board Exams (Misleading)</button>
                 <button class="preset-chip" data-sample="ISRO confirms preliminary integration of the Bharatiya Antariksh Station module docking system.">ISRO Station (Verified)</button>
               </div>
             </div>
@@ -785,6 +785,6 @@
   </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
