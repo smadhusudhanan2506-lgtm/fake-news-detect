@@ -1,6 +1,6 @@
 // ═══ DEPLOYMENT CONFIG ═══
-// When deploying frontend on Vercel and backend on Render, set your Render URL here:
-const RENDER_BACKEND_URL = ''; // e.g. 'https://factcheck-ai-server.onrender.com'
+// Live Render Backend for Vercel Frontend:
+const RENDER_BACKEND_URL = 'https://fake-news-detect-1-cfgb.onrender.com';
 
 const BACKEND_ORIGIN = RENDER_BACKEND_URL
   || (window.location.port === '5000' ? window.location.origin : '')
