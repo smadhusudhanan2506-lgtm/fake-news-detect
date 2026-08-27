@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FactCheck AI — AI-Powered Fake News Detection, Misinformation Verification, and Conversational News Assistant. Verify Before You Believe.">
+  <title>FactCheck AI — Verify Before You Believe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ═══════════════════ TOP HEADER BAR ═══════════════════ -->
+  <header class="app-header" id="app-header">
+    <div class="header-left">
+      <button class="hamburger-btn" id="hamburger-btn" title="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="brand-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div class="brand-info">
+        <h1>FactCheck AI</h1>
+        <span class="tagline">Verify Before You Believe.</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="server-status" id="server-status">
+        <span class="status-dot online"></span>
+        <span class="status-text">Server Online</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div id="header-auth-container" class="header-auth-container">
+        <div id="header-user-badge" class="header-user-badge" title="Click to view Profile">
+          <div class="user-avatar-sm" id="header-avatar">A</div>
+          <div class="header-user-details">
+            <span class="header-user-name" id="header-user-name">Aditi Sharma</span>
+            <span class="header-user-role" id="header-user-role">User</span>
+          </div>
+        </div>
+        <button class="btn-auth-action" id="btn-open-auth-modal" title="Sign In or Register">
+          <i class="fa-solid fa-right-to-bracket"></i> <span>Sign In</span>
+        </button>
+      </div>
+      <button class="theme-toggle-btn" id="theme-toggle" title="Toggle Theme">
+        <i class="fa-solid fa-sun"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════ APP SHELL ═══════════════════ -->
+  <div class="app-shell">
+
+    <!-- ──────── SIDEBAR NAV (Desktop / Tablet) ──────── -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" data-target="home">
+          <i class="fa-solid fa-house"></i><span>Home</span>
+        </button>
+        <button class="sidebar-item" data-target="verify">
+          <i class="fa-solid fa-shield-check"></i><span>Verify</span>
+        </button>
+        <button class="sidebar-item" data-target="chat">
+          <i class="fa-solid fa-robot"></i><span>AI Chat</span>
+        </button>
+        <button class="sidebar-item" data-target="news">
+          <i class="fa-solid fa-newspaper"></i><span>News Hub</span>
+        </button>
+        <button class="sidebar-item" data-target="history">
+          <i class="fa-solid fa-clock-rotate-left"></i><span>History</span>
+        </button>
+        <button class="sidebar-item" data-target="moderator">
+          <i class="fa-solid fa-gavel"></i><span>Moderator</span>
+        </button>
+        <button class="sidebar-item" data-target="profile">
+          <i class="fa-solid fa-user-gear"></i><span>Profile</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar" id="sidebar-avatar">A</div>
+          <div class="sidebar-user-info">
+            <strong id="sidebar-user-name">Aditi Sharma</strong>
+            <span id="sidebar-user-role">User</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay for mobile drawer -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ──────── MAIN CONTENT AREA ──────── -->
+    <main class="main-content" id="main-content">
+
+      <!-- ════════════ 1. HOME SCREEN ════════════ -->
+      <section class="screen-view active" id="screen-home">
+        <div class="screen-inner">
+          <div class="home-header">
+            <div>
+              <span class="greeting-label" id="greeting-label">Good Day,</span>
+              <h2 class="user-greeting-name" id="user-display-name">Aditi Sharma</h2>
+            </div>
+            <div class="header-actions">
+              <button class="icon-circle-btn" id="notification-btn" title="Notifications">
+                <i class="fa-regular fa-bell"></i>
+                <span class="badge-dot"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Verify Search -->
+          <div class="quick-verify-search" id="home-quick-verify">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="home-search-input" placeholder="Paste a WhatsApp forward, URL, or claim to verify...">
+            <button class="btn-verify-badge" id="home-search-btn">Verify</button>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="section-title-row">
+            <h3>Quick Verification</h3>
+          </div>
+          <div class="quick-actions-grid">
+            <div class="action-card" data-verify-tab="text">
+              <div class="action-icon icon-indigo"><i class="fa-solid fa-paste"></i></div>
+              <span>Paste Text</span>
+            </div>
+            <div class="action-card" data-verify-tab="whatsapp">
+              <div class="action-icon icon-emerald"><i class="fa-brands fa-whatsapp"></i></div>
+              <span>WhatsApp</span>
+            </div>
+            <div class="action-card" data-verify-tab="url">
+              <div class="action-icon icon-sky"><i class="fa-solid fa-link"></i></div>
+              <span>Verify URL</span>
+            </div>
+            <div class="action-card" data-verify-tab="screenshot">
+              <div class="action-icon icon-purple"><i class="fa-solid fa-camera"></i></div>
+              <span>Screenshot</span>
+            </div>
+            <div class="action-card" data-verify-tab="image">
+              <div class="action-icon icon-amber"><i class="fa-solid fa-image"></i></div>
+              <span>Image OCR</span>
+            </div>
+            <div class="action-card" data-verify-tab="video">
+              <div class="action-icon icon-rose"><i class="fa-solid fa-film"></i></div>
+              <span>Video File</span>
+            </div>
+          </div>
+
+          <!-- Daily Briefing Banner -->
+          <div class="daily-briefing-banner" id="daily-briefing-banner">
+            <div class="briefing-tag">
+              <span><i class="fa-solid fa-sun text-amber"></i> DAILY NEWS BRIEFING</span>
+              <span class="briefing-date" id="briefing-date-label">Today</span>
+            </div>
+            <h4 id="briefing-headline">Curated verified top stories for your personalized interests.</h4>
+            <button class="btn-read-briefing" id="btn-open-briefing">
+              <i class="fa-solid fa-book-open"></i> Read Briefing
+            </button>
+          </div>
+
+          <!-- Fact-Check Carousel -->
+          <div class="section-title-row">
+            <h3>Verified Fact-Checks</h3>
+            <a href="#" class="view-all-link" id="link-view-all-news">View All</a>
+          </div>
+          <div class="news-horizontal-scroll" id="trending-news-feed"></div>
+
+          <!-- Recent Analyses -->
+          <div class="section-title-row">
+            <h3>Recent Analyses</h3>
+            <a href="#" class="view-all-link" id="link-view-all-history">History</a>
+          </div>
+          <div class="recent-analyses-list" id="recent-analyses-container"></div>
+        </div>
+      </section>
+
+      <!-- ════════════ 2. VERIFY SCREEN ════════════ -->
+      <section class="screen-view" id="screen-verify">
+        <div class="screen-inner screen-inner--narrow">
+          <div class="screen-top-bar">
+            <div>
+              <h2>Verify Content</h2>
+              <span class="subtext">Multi-stage AI evidence verification pipeline</span>
+            </div>
+          </div>
+
+          <div class="verify-nav-tabs">
+            <button class="v-tab-btn active" data-vtab="text"><i class="fa-solid fa-font"></i> Text</button>
+            <button class="v-tab-btn" data-vtab="whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+            <button class="v-tab-btn" data-vtab="url"><i class="fa-solid fa-link"></i> Link / URL</button>
+            <button class="v-tab-btn" data-vtab="image"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Image & Deepfake</button>
+            <button class="v-tab-btn" data-vtab="video"><i class="fa-solid fa-clapperboard"></i> AI Video & Reel</button>
+          </div>
+
+          <div class="verify-tab-body">
+            <div class="whatsapp-notice hidden" id="whatsapp-banner">
+              <i class="fa-solid fa-shield-check"></i>
+              <div>
+                <strong>WhatsApp Forward Mode Active</strong>
+                <p>Strips forwarding markers and analyzes sensational phrasing automatically.</p>
+              </div>
+            </div>
+
+            <div class="input-card" id="text-input-container">
+              <textarea id="verify-text-input" rows="6" placeholder="Paste a WhatsApp forward, social media post, message, or news claim here..."></textarea>
+              <div class="input-card-footer">
+                <button class="btn-text-action" id="btn-paste-clipboard"><i class="fa-solid fa-clipboard"></i> Paste</button>
+                <button class="btn-text-action" id="btn-clear-text"><i class="fa-solid fa-xmark"></i> Clear</button>
+              </div>
+            </div>
+
+            <div class="input-card hidden" id="url-input-container">
+              <div class="url-field-wrapper">
+                <i class="fa-solid fa-link"></i>
+                <input type="url" id="verify-url-input" placeholder="https://example.com/news-story or Instagram Reel / YouTube / X link...">
+              </div>
+            </div>
+
+            <div class="media-upload-zone hidden" id="media-input-container">
+              <div class="upload-drop-area" id="drop-area">
+                <i class="fa-solid fa-wand-magic-sparkles upload-icon" style="color:var(--primary-light);"></i>
+                <h4 id="media-drop-heading">Upload Image or Video / Reel to Detect AI Generation</h4>
+                <p id="media-drop-sub">Scans for Midjourney, DALL-E, Sora, FaceSwap Deepfakes, synthetic speech & visual artifacts.</p>
+                <input type="file" id="media-file-input" class="hidden-file-input" accept="image/*,video/*">
+                <button class="btn-browse-file" id="btn-browse-file"><i class="fa-solid fa-folder-open"></i> Browse Media File</button>
+                <div class="selected-file-info hidden" id="selected-file-info">
+                  <i class="fa-solid fa-file-circle-check" style="color:var(--verified-green);"></i> <span id="selected-file-name">filename.jpg</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sample-presets">
+              <span class="preset-label"><i class="fa-solid fa-bolt"></i> Try Sample Claims:</span>
+              <div class="preset-chips">
+                <button class="preset-chip" data-sample="Breaking: Government announces Rs 50,000 direct cash grant for all students from next month.">Scholarship Scheme (False)</button>
+                <button class="preset-chip" data-sample="Class 10 and 12 Board Exams scrapped entirely nationwide under new education guidelines.">Board Exams (Misleading)</button>
+                <button class="preset-chip" data-sample="ISRO confirms preliminary integration of the Bharatiya Antariksh Station module docking system.">ISRO Station (Verified)</button>
+              </div>
+            </div>
+
+            <button class="btn-primary-action" id="btn-submit-verification">
+              <i class="fa-solid fa-shield-virus"></i> Analyze & Verify Media
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════ 3. RESULT SCREEN ════════════ -->
+      <section class="screen-view" id="screen-result">
+        <div class="screen-inner screen-inner--narrow">
+          <div class="screen-top-bar">
+            <button class="btn-back-icon" id="btn-back-from-result"><i class="fa-solid fa-arrow-left"></i></button>
+            <h2>Verification Result</h2>
+            <div class="result-actions">
+              <button class="icon-circle-btn" id="btn-flag-moderator" title="Report to Moderator"><i class="fa-regular fa-flag"></i></button>
+              <button class="icon-circle-btn" id="btn-share-result" title="Share Result"><i class="fa-solid fa-share-nodes"></i></button>
+            </div>
+          </div>
+
+          <div class="result-two-col">
+            <div class="verdict-banner-card" id="result-verdict-banner">
+              <div class="verdict-pill-badge" id="result-verdict-badge">
+                <i class="fa-solid fa-check-circle"></i> VERIFIED
+              </div>
+              <div class="confidence-radial-container">
+                <div class="confidence-circle" id="result-confidence-circle">
+                  <span class="confidence-number" id="result-confidence-number">92%</span>
+                  <span class="confidence-label">Confidence</span>
+                </div>
+              </div>
+              <p class="confidence-disclaimer">
+                Confidence reflects the strength and agreement of available evidence, not mathematical certainty.
+              </p>
+            </div>
+
+            <div class="result-details-col">
+              <!-- AI & Deepfake Forensics Card -->
+              <div class="result-section-box hidden" id="result-ai-media-card" style="border-left: 3px solid var(--primary-light); background: rgba(99, 102, 241, 0.05); padding:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span class="section-micro-title" style="color:var(--primary-light);"><i class="fa-solid fa-robot"></i> AI & DEEPFAKE FORENSIC DETECTOR</span>
+                  <span id="ai-media-badge" style="font-size:11px; font-weight:700; padding:3px 10px; border-radius:6px; background:rgba(239, 68, 68, 0.15); color:var(--false-red);">
+                    AI GENERATED
+                  </span>
+                </div>
+                <p id="ai-media-summary" style="font-size:13px; font-weight:600; margin-bottom:12px; line-height:1.4;">Forensic analysis summary...</p>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px; font-size:11px;">
+                  <div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                      <span style="color:var(--c-text-sub);">Facial / Anatomy Realism</span>
+                      <strong id="score-facial">95%</strong>
+                    </div>
+                    <div style="background:var(--c-surface); height:6px; border-radius:3px; overflow:hidden;">
+                      <div id="bar-facial" style="background:var(--verified-green); height:100%; width:95%; transition: width 0.4s;"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                      <span style="color:var(--c-text-sub);">Lighting & Shadow Physics</span>
+                      <strong id="score-lighting">90%</strong>
+                    </div>
+                    <div style="background:var(--c-surface); height:6px; border-radius:3px; overflow:hidden;">
+                      <div id="bar-lighting" style="background:var(--verified-green); height:100%; width:90%; transition: width 0.4s;"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                      <span style="color:var(--c-text-sub);">Pixel & Texture Naturalness</span>
+                      <strong id="score-texture">88%</strong>
+                    </div>
+                    <div style="background:var(--c-surface); height:6px; border-radius:3px; overflow:hidden;">
+                      <div id="bar-texture" style="background:var(--verified-green); height:100%; width:88%; transition: width 0.4s;"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                      <span style="color:var(--c-text-sub);">Sensor & Metadata Integrity</span>
+                      <strong id="score-metadata">92%</strong>
+                    </div>
+                    <div style="background:var(--c-surface); height:6px; border-radius:3px; overflow:hidden;">
+                      <div id="bar-metadata" style="background:var(--verified-green); height:100%; width:92%; transition: width 0.4s;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="ai-media-observations" style="font-size:12px; color:var(--c-text-sub); border-top:1px solid var(--c-border); padding-top:8px;"></div>
+              </div>
+
+              <div class="result-section-box">
+                <span class="section-micro-title">ANALYZED CONTENT</span>
+                <p class="analyzed-claim-text" id="result-claim-text">"Sample Claim..."</p>
+              </div>
+
+              <div class="result-section-box">
+                <span class="section-micro-title">WHY THIS VERDICT?</span>
+                <p class="explanation-summary" id="result-explanation">Explanation summary...</p>
+                <ul class="why-points-list" id="result-why-points"></ul>
+              </div>
+
+              <div class="result-section-box">
+                <div class="sources-header-row">
+                  <span class="section-micro-title">SOURCES & CITATIONS</span>
+                  <span class="sources-count" id="result-sources-count">3 Sources</span>
+                </div>
+                <div class="sources-list-container" id="result-sources-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-buttons-row">
+            <button class="btn-secondary-action" id="btn-ask-ai-about-this">
+              <i class="fa-solid fa-comments"></i> Ask AI About This
+            </button>
+            <button class="btn-primary-action" id="btn-share-result-footer">
+              <i class="fa-solid fa-share-nodes"></i> Share Result
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════ 4. AI CHAT ════════════ -->
+      <section class="screen-view" id="screen-chat">
+        <div class="screen-inner chat-screen-layout">
+          <div class="chat-header-bar">
+            <div>
+              <h2>FactCheck AI Assistant</h2>
+              <span class="subtext">Evidence-grounded conversational intelligence</span>
+            </div>
+            <button class="icon-circle-btn" id="btn-clear-chat" title="New Chat"><i class="fa-solid fa-rotate-right"></i></button>
+          </div>
+
+          <div class="chat-mode-pills">
+            <button class="chat-mode-pill active" data-chatmode="general">🤖 General</button>
+            <button class="chat-mode-pill" data-chatmode="news">📰 News Query</button>
+            <button class="chat-mode-pill" data-chatmode="verification">🔍 Verify</button>
+          </div>
+
+          <div class="chat-messages-container" id="chat-messages-container"></div>
+
+          <div class="chat-typing-indicator hidden" id="chat-typing-indicator">
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+            <span id="typing-text">FactCheck AI is synthesizing evidence...</span>
+          </div>
+
+          <div class="chat-input-bar">
+            <button class="btn-chat-icon" id="btn-voice-input" title="Voice Input"><i class="fa-solid fa-microphone"></i></button>
+            <textarea id="chat-text-input" rows="1" placeholder="Ask anything or paste a claim to verify..."></textarea>
+            <button class="btn-chat-icon btn-send" id="btn-chat-send" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════ 5. NEWS HUB ════════════ -->
+      <section class="screen-view" id="screen-news">
+        <div class="screen-inner">
+          <div class="screen-top-bar">
+            <h2>Verified News Hub</h2>
+            <button class="icon-circle-btn" id="btn-refresh-news"><i class="fa-solid fa-rotate"></i></button>
+          </div>
+
+          <div class="news-search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="news-search-input" placeholder="Search verified news & fact-checks...">
+          </div>
+
+          <div class="news-categories-chips" id="news-categories-chips">
+            <button class="cat-chip active" data-category="All">All</button>
+            <button class="cat-chip" data-category="Tamil Nadu">🔥 Tamil Nadu</button>
+            <button class="cat-chip" data-category="India">India</button>
+            <button class="cat-chip" data-category="World">World</button>
+            <button class="cat-chip" data-category="Technology">Technology</button>
+            <button class="cat-chip" data-category="Science">Science</button>
+            <button class="cat-chip" data-category="Health">Health</button>
+            <button class="cat-chip" data-category="Politics">Politics</button>
+            <button class="cat-chip" data-category="Business">Business</button>
+          </div>
+
+          <div class="news-articles-list" id="news-articles-list"></div>
+        </div>
+      </section>
+
+      <!-- ════════════ 6. HISTORY ════════════ -->
+      <section class="screen-view" id="screen-history">
+        <div class="screen-inner">
+          <div class="screen-top-bar">
+            <h2>Verification History</h2>
+            <button class="icon-circle-btn" id="btn-refresh-history"><i class="fa-solid fa-rotate"></i></button>
+          </div>
+
+          <div class="news-search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="history-search-input" placeholder="Search past verifications...">
+          </div>
+
+          <div class="history-filter-chips">
+            <button class="h-filter-chip active" data-hfilter="all">All</button>
+            <button class="h-filter-chip" data-hfilter="verified">Verified</button>
+            <button class="h-filter-chip" data-hfilter="false">False</button>
+            <button class="h-filter-chip" data-hfilter="misleading">Misleading</button>
+            <button class="h-filter-chip" data-hfilter="unverifiable">Unverifiable</button>
+          </div>
+
+          <div class="history-items-list" id="history-items-list"></div>
+        </div>
+      </section>
+
+      <!-- ════════════ 7. MODERATOR ════════════ -->
+      <section class="screen-view" id="screen-moderator">
+        <div class="screen-inner">
+          <div class="screen-top-bar">
+            <h2>Moderator Command Center</h2>
+            <span class="badge-role-mod">MODERATOR</span>
+          </div>
+
+          <div class="mod-stats-row" id="mod-stats-container">
+            <div class="mod-stat-box stat-orange">
+              <span class="stat-num" id="mod-stat-pending">1</span>
+              <span class="stat-title">Pending</span>
+            </div>
+            <div class="mod-stat-box stat-green">
+              <span class="stat-num" id="mod-stat-reviewed">0</span>
+              <span class="stat-title">Reviewed</span>
+            </div>
+            <div class="mod-stat-box stat-indigo">
+              <span class="stat-num" id="mod-stat-today">1</span>
+              <span class="stat-title">Reports Today</span>
+            </div>
+          </div>
+
+          <div class="section-title-row"><h3>Flagged Content Queue</h3></div>
+          <div class="mod-queue-list" id="mod-queue-container"></div>
+
+          <div class="section-title-row" style="margin-top: 24px;"><h3>Domain Reliability Ratings</h3></div>
+          <div class="mod-sources-list" id="mod-sources-container"></div>
+        </div>
+      </section>
+
+      <!-- ════════════ 8. PROFILE ════════════ -->
+      <section class="screen-view" id="screen-profile">
+        <div class="screen-inner screen-inner--narrow">
+          <div class="screen-top-bar"><h2>Profile & Settings</h2></div>
+
+          <div class="profile-user-card">
+            <div class="profile-avatar"><span id="profile-avatar-initial">A</span></div>
+            <div class="profile-details">
+              <h3 id="profile-name">Aditi Sharma</h3>
+              <p id="profile-email">aditi@example.com</p>
+              <span class="profile-role-badge" id="profile-role-badge">USER</span>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <span class="settings-group-title">ACCOUNT & DATABASE</span>
+            <div class="setting-item clickable" id="btn-profile-switch-account">
+              <div class="setting-item-label">
+                <i class="fa-solid fa-user-plus text-indigo"></i>
+                <div><strong>Switch or Register Account</strong><p>Log in to your existing MongoDB account</p></div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-muted"></i>
+            </div>
+            <div class="setting-item clickable" id="btn-profile-logout">
+              <div class="setting-item-label">
+                <i class="fa-solid fa-right-from-bracket text-rose"></i>
+                <div><strong class="text-rose">Sign Out</strong><p>Exit current session</p></div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-muted"></i>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <span class="settings-group-title">PREFERENCES</span>
+            <div class="setting-item">
+              <div class="setting-item-label">
+                <i class="fa-solid fa-bell"></i>
+                <div><strong>Push Notifications</strong><p>Daily briefing and breaking news</p></div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="pref-notifications" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-item-label">
+                <i class="fa-solid fa-volume-high"></i>
+                <div><strong>Text-To-Speech Audio</strong><p>Listen to AI answers automatically</p></div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="pref-tts"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <span class="settings-group-title">STORAGE & CACHE</span>
+            <div class="setting-item clickable" id="btn-clear-cache">
+              <div class="setting-item-label">
+                <i class="fa-solid fa-trash-can text-rose"></i>
+                <div><strong>Clear Local Cache</strong><p>Remove offline analyses and history</p></div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-muted"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main><!-- /.main-content -->
+
+    <!-- ──────── BOTTOM NAV (Mobile only) ──────── -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <button class="bnav-item active" data-target="home"><i class="fa-solid fa-house"></i><span>Home</span></button>
+      <button class="bnav-item" data-target="verify"><i class="fa-solid fa-shield-check"></i><span>Verify</span></button>
+      <button class="bnav-item" data-target="chat"><i class="fa-solid fa-robot"></i><span>Chat</span></button>
+      <button class="bnav-item" data-target="news"><i class="fa-solid fa-newspaper"></i><span>News</span></button>
+      <button class="bnav-item" data-target="history"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></button>
+      <button class="bnav-item" data-target="profile"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+    </nav>
+
+  </div><!-- /.app-shell -->
+
+  <!-- ═══════════ MODALS ═══════════ -->
+
+  <!-- User Authentication (Login / Register) Modal -->
+  <div class="modal-overlay hidden" id="auth-modal">
+    <div class="auth-dialog-card">
+      <div class="auth-dialog-header">
+        <div class="auth-brand-logo">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div>
+            <h3>FactCheck AI</h3>
+            <span>Secure MongoDB Account</span>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="btn-close-auth"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="auth-tab-buttons">
+        <button class="auth-tab-btn active" id="tab-btn-login">Sign In</button>
+        <button class="auth-tab-btn" id="tab-btn-register">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-login" class="auth-form-body">
+        <div class="auth-field-group">
+          <label for="login-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input type="email" id="login-email" required placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field-group">
+          <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+          <input type="password" id="login-password" required placeholder="Enter your password" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary-action btn-auth-submit" id="btn-submit-login">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In to Account
+        </button>
+        <p class="auth-switch-prompt">
+          New to FactCheck AI? <a href="#" id="link-to-register">Create a free account</a>
+        </p>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="form-register" class="auth-form-body hidden">
+        <div class="auth-field-group">
+          <label for="reg-name"><i class="fa-solid fa-user"></i> Full Name</label>
+          <input type="text" id="reg-name" required placeholder="e.g. Rahul Verma">
+        </div>
+        <div class="auth-field-group">
+          <label for="reg-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input type="email" id="reg-email" required placeholder="name@domain.com">
+        </div>
+        <div class="auth-field-group">
+          <label for="reg-password"><i class="fa-solid fa-lock"></i> Password (min. 6 chars)</label>
+          <input type="password" id="reg-password" required minlength="6" placeholder="Choose a strong password">
+        </div>
+        <div class="auth-field-group">
+          <label for="reg-role"><i class="fa-solid fa-id-badge"></i> Account Type</label>
+          <select id="reg-role">
+            <option value="user">Standard User (Fact-Checking & News)</option>
+            <option value="moderator">Moderator (Review & Audit Queue)</option>
+            <option value="admin">Platform Admin</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary-action btn-auth-submit" id="btn-submit-register">
+          <i class="fa-solid fa-user-plus"></i> Register in MongoDB
+        </button>
+        <p class="auth-switch-prompt">
+          Already registered? <a href="#" id="link-to-login">Sign in here</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Verification Stage Progress Modal -->
+  <div class="modal-overlay hidden" id="stage-modal">
+    <div class="stage-dialog-card">
+      <div class="stage-dialog-header">
+        <div class="spinner-ring"></div>
+        <h3>FactCheck AI Engine</h3>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="stage-progress-fill" style="width: 25%;"></div>
+      </div>
+      <div class="stage-steps-list">
+        <div class="stage-step" id="step-1"><i class="fa-solid fa-circle-notch fa-spin"></i> <span>Reading content & metadata...</span></div>
+        <div class="stage-step" id="step-2"><i class="fa-regular fa-circle"></i> <span>Extracting atomic claims...</span></div>
+        <div class="stage-step" id="step-3"><i class="fa-regular fa-circle"></i> <span>Searching fact-check & government sources...</span></div>
+        <div class="stage-step" id="step-4"><i class="fa-regular fa-circle"></i> <span>Comparing evidence & AI reasoning...</span></div>
+        <div class="stage-step" id="step-5"><i class="fa-regular fa-circle"></i> <span>Verification complete.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Briefing Modal -->
+  <div class="modal-overlay hidden" id="briefing-modal">
+    <div class="briefing-dialog-card">
+      <div class="briefing-dialog-header">
+        <div>
+          <span class="text-amber"><i class="fa-solid fa-sun"></i> Daily Briefing</span>
+          <h3 id="modal-briefing-title">Today's Essential Stories</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-briefing"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="briefing-stories-list" id="modal-briefing-stories"></div>
+    </div>
+  </div>
+
+  <!-- Moderation Review Modal -->
+  <div class="modal-overlay hidden" id="review-modal">
+    <div class="review-dialog-card">
+      <div class="review-dialog-header">
+        <h3>Adjudicate Moderation Item</h3>
+        <button class="btn-close-modal" id="btn-close-review"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="review-dialog-body">
+        <p><strong>Claim:</strong> <span id="review-modal-claim">"Claim..."</span></p>
+        <p><strong>Reporter Reason:</strong> <span id="review-modal-reason">Reason...</span></p>
+        <label for="review-verdict-select">Final Verdict:</label>
+        <select id="review-verdict-select">
+          <option value="verified">VERIFIED (Confirmed True)</option>
+          <option value="false">FALSE (Debunked)</option>
+          <option value="misleading">MISLEADING (Partial Truth)</option>
+          <option value="unverifiable">UNVERIFIABLE</option>
+        </select>
+        <label for="review-notes-input">Moderator Notes & Evidence Citations:</label>
+        <textarea id="review-notes-input" rows="3" placeholder="Explain the adjudication decision..."></textarea>
+        <div class="review-modal-actions">
+          <button class="btn-secondary-action" id="btn-reject-report">Dismiss Report</button>
+          <button class="btn-primary-action" id="btn-confirm-review">Submit Decision</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
