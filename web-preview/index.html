@@ -548,74 +548,74 @@
 
       <!-- ════════════ 8. DEDICATED AUTHENTICATION / LOGIN & REGISTER SCREEN ════════════ -->
       <section class="screen-view" id="screen-auth">
-        <div class="screen-inner screen-inner--narrow" style="max-width: 480px; margin: 30px auto;">
-          <div class="auth-page-card" style="background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 18px; padding: 32px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <div style="display: inline-flex; align-items: center; justify-content: center; width: 58px; height: 58px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; font-size: 26px; margin-bottom: 12px; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);">
+        <div class="screen-inner screen-inner--narrow" style="max-width: 460px; margin: 0 auto; width: 100%;">
+          <div class="auth-page-card" style="background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 16px; padding: 22px 26px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);">
+            <div style="text-align: center; margin-bottom: 14px;">
+              <div style="display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; font-size: 20px; margin-bottom: 8px; box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);">
                 <i class="fa-solid fa-shield-halved"></i>
               </div>
-              <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">FactCheck AI</h2>
-              <p style="font-size: 13px; color: var(--c-text-sub);">Sign In or Register with MongoDB Cloud Database</p>
-              <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--verified-green); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 20px; margin-top: 10px;">
-                <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--verified-green); box-shadow: 0 0 8px var(--verified-green);"></span>
+              <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 2px;">FactCheck AI</h2>
+              <p style="font-size: 12px; color: var(--c-text-sub);">Sign In or Register with MongoDB Cloud Database</p>
+              <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--verified-green); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 3px 10px; border-radius: 20px; margin-top: 6px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--verified-green); box-shadow: 0 0 6px var(--verified-green);"></span>
                 MongoDB Atlas Connected
               </div>
             </div>
 
             <!-- Page Auth Tabs -->
-            <div class="auth-tab-buttons" style="display: flex; gap: 8px; margin-bottom: 24px; background: var(--c-surface-v); padding: 5px; border-radius: 12px; border: 1px solid var(--c-border);">
-              <button class="auth-tab-btn active" id="pauth-tab-login" style="flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+            <div class="auth-tab-buttons" style="display: flex; gap: 6px; margin-bottom: 16px; background: var(--c-surface-v); padding: 4px; border-radius: 10px; border: 1px solid var(--c-border);">
+              <button class="auth-tab-btn active" id="pauth-tab-login" style="flex: 1; padding: 8px; border: none; border-radius: 7px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;">
                 <i class="fa-solid fa-right-to-bracket"></i> Sign In
               </button>
-              <button class="auth-tab-btn" id="pauth-tab-register" style="flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+              <button class="auth-tab-btn" id="pauth-tab-register" style="flex: 1; padding: 8px; border: none; border-radius: 7px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;">
                 <i class="fa-solid fa-user-plus"></i> Create Account
               </button>
             </div>
 
             <!-- Page Login Form -->
             <form id="form-page-login">
-              <div class="auth-field-group" style="margin-bottom: 16px;">
-                <label for="plogin-email" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--c-text-sub);"><i class="fa-solid fa-envelope"></i> Email Address</label>
-                <input type="email" id="plogin-email" placeholder="name@example.com" required autocomplete="email" style="width: 100%; padding: 12px 14px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 14px;">
+              <div class="auth-field-group" style="margin-bottom: 12px;">
+                <label for="plogin-email" style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--c-text-sub);"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" id="plogin-email" placeholder="name@example.com" required autocomplete="email" style="width: 100%; padding: 10px 12px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 13px;">
               </div>
-              <div class="auth-field-group" style="margin-bottom: 18px;">
-                <label for="plogin-password" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--c-text-sub);"><i class="fa-solid fa-lock"></i> Password</label>
-                <input type="password" id="plogin-password" placeholder="Enter your password" required autocomplete="current-password" style="width: 100%; padding: 12px 14px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 14px;">
+              <div class="auth-field-group" style="margin-bottom: 14px;">
+                <label for="plogin-password" style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--c-text-sub);"><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" id="plogin-password" placeholder="Enter your password" required autocomplete="current-password" style="width: 100%; padding: 10px 12px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 13px;">
               </div>
-              <button type="submit" class="btn-primary-action" id="btn-page-submit-login" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; border-radius: 10px;">
+              <button type="submit" class="btn-primary-action" id="btn-page-submit-login" style="width: 100%; padding: 12px; font-size: 14px; font-weight: 700; border-radius: 8px; background: var(--primary); color: white; border: none; cursor: pointer; box-shadow: 0 4px 14px var(--primary-glow);">
                 <i class="fa-solid fa-right-to-bracket"></i> Sign In to Account
               </button>
-              <p style="font-size: 12px; color: var(--c-text-sub); text-align: center; margin-top: 16px;">
+              <p style="font-size: 12px; color: var(--c-text-sub); text-align: center; margin-top: 12px;">
                 Don't have an account yet? <a href="#" id="link-page-to-register" style="color: var(--primary-light); font-weight: 700; text-decoration: none;">Create free account</a>
               </p>
             </form>
 
             <!-- Page Register Form -->
             <form id="form-page-register" class="hidden">
-              <div class="auth-field-group" style="margin-bottom: 14px;">
-                <label for="preg-name" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--c-text-sub);"><i class="fa-solid fa-user"></i> Full Name</label>
-                <input type="text" id="preg-name" placeholder="e.g. Priya Sundaram" required autocomplete="name" style="width: 100%; padding: 12px 14px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 14px;">
+              <div class="auth-field-group" style="margin-bottom: 10px;">
+                <label for="preg-name" style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--c-text-sub);"><i class="fa-solid fa-user"></i> Full Name</label>
+                <input type="text" id="preg-name" placeholder="e.g. Madhu" required autocomplete="name" style="width: 100%; padding: 10px 12px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 13px;">
+              </div>
+              <div class="auth-field-group" style="margin-bottom: 10px;">
+                <label for="preg-email" style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--c-text-sub);"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" id="preg-email" placeholder="name@example.com" required autocomplete="email" style="width: 100%; padding: 10px 12px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 13px;">
+              </div>
+              <div class="auth-field-group" style="margin-bottom: 10px;">
+                <label for="preg-password" style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--c-text-sub);"><i class="fa-solid fa-lock"></i> Password (min 6 characters)</label>
+                <input type="password" id="preg-password" placeholder="Create a password" required minlength="6" autocomplete="new-password" style="width: 100%; padding: 10px 12px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 13px;">
               </div>
               <div class="auth-field-group" style="margin-bottom: 14px;">
-                <label for="preg-email" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--c-text-sub);"><i class="fa-solid fa-envelope"></i> Email Address</label>
-                <input type="email" id="preg-email" placeholder="name@example.com" required autocomplete="email" style="width: 100%; padding: 12px 14px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 14px;">
-              </div>
-              <div class="auth-field-group" style="margin-bottom: 14px;">
-                <label for="preg-password" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--c-text-sub);"><i class="fa-solid fa-lock"></i> Password (min 6 characters)</label>
-                <input type="password" id="preg-password" placeholder="Create a password" required minlength="6" autocomplete="new-password" style="width: 100%; padding: 12px 14px; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 8px; color: var(--c-text); font-size: 14px;">
-              </div>
-              <div class="auth-field-group" style="margin-bottom: 18px;">
-                <label for="preg-role" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--c-text-sub);"><i class="fa-solid fa-shield-halved"></i> Account Role</label>
-                <select id="preg-role" style="width: 100%; padding: 12px 14px; background: var(--c-surface-v); border: 1px solid var(--c-border); color: var(--c-text); border-radius: 8px; font-size: 14px;">
+                <label for="preg-role" style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--c-text-sub);"><i class="fa-solid fa-shield-halved"></i> Account Role</label>
+                <select id="preg-role" style="width: 100%; padding: 10px 12px; background: var(--c-surface-v); border: 1px solid var(--c-border); color: var(--c-text); border-radius: 8px; font-size: 13px;">
                   <option value="user">Regular User (Fact-Checking & AI Chat)</option>
                   <option value="moderator">Fact-Checker / Moderator</option>
                   <option value="admin">Administrator</option>
                 </select>
               </div>
-              <button type="submit" class="btn-primary-action" id="btn-page-submit-register" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; border-radius: 10px;">
+              <button type="submit" class="btn-primary-action" id="btn-page-submit-register" style="width: 100%; padding: 12px; font-size: 14px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border: none; cursor: pointer; box-shadow: 0 4px 14px var(--primary-glow);">
                 <i class="fa-solid fa-user-plus"></i> Register in MongoDB Atlas
               </button>
-              <p style="font-size: 12px; color: var(--c-text-sub); text-align: center; margin-top: 16px;">
+              <p style="font-size: 12px; color: var(--c-text-sub); text-align: center; margin-top: 12px;">
                 Already have an account? <a href="#" id="link-page-to-login" style="color: var(--primary-light); font-weight: 700; text-decoration: none;">Sign In here</a>
               </p>
             </form>
@@ -771,6 +771,6 @@
   </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

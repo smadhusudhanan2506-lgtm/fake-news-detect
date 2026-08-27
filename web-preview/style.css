@@ -285,6 +285,9 @@ body.light-theme {
 }
 
 /* ──────── Auth Mode (Hides Sidebar & Centers Auth Page) ──────── */
+body.auth-mode {
+  overflow-y: auto !important;
+}
 body.auth-mode .sidebar {
   display: none !important;
 }
@@ -299,22 +302,27 @@ body.auth-mode .header-user-badge {
 }
 body.auth-mode .app-shell {
   display: block !important;
-  height: calc(100vh - var(--header-h));
+  height: auto !important;
+  min-height: calc(100vh - var(--header-h));
+  overflow: visible !important;
 }
 body.auth-mode .main-content {
   width: 100% !important;
   max-width: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  height: auto !important;
   min-height: calc(100vh - var(--header-h)) !important;
-  padding: 24px 16px !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: 24px 16px 60px 16px !important;
 }
 body.auth-mode #screen-auth {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   width: 100% !important;
+  padding: 0 !important;
 }
 body.auth-mode .auth-page-card {
   width: 100%;
