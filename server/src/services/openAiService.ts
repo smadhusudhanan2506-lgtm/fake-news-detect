@@ -329,11 +329,42 @@ Respond in strict JSON format:
     };
   }
 
+
   /**
-   * Conversational AI Assistant with Mode Separation:
-   * - General: Friendly, warm, natural conversational AI companion (like ChatGPT).
-   * - News Query: Timely, objective summaries of news topics.
-   * - Verification: Rigorous claim analysis with verdicts and evidence.
+   * Helper to detect simple greetings, casual chit-chat, small talk, and basic math
+   */
+  private static isConversationalOrCasual(msg: string): boolean {
+    const clean = msg.trim().toLowerCase().replace(/[?!.,']/g, '');
+    const casualPhrases = [
+      'hi', 'hello', 'hey', 'yo', 'sup', 'howdy', 'hola', 'namaste',
+      'how are you', 'how are you doing', 'how do you do', 'how r u', 'hows it going', 'whats up', 'wassup',
+      'good morning', 'good afternoon', 'good evening', 'good night',
+      'who are you', 'what is your name', 'what are you', 'what can you do', 'tell me about yourself', 'who made you', 'who created you',
+      'thanks', 'thank you', 'thank u', 'thx', 'thank you so much',
+      'bye', 'goodbye', 'see you', 'cya',
+      'ok', 'okay', 'cool', 'great', 'awesome', 'nice', 'yes', 'no', 'sure', 'alright',
+      'tell me a joke', 'tell a joke', 'make me laugh', 'say something funny'
+    ];
+
+    if (casualPhrases.includes(clean)) return true;
+
+    // Greeting patterns
+    if (/^(hi+|hello+|hey+|yo|sup|greetings|hola|howdy|good\s+(morning|afternoon|evening))\b/i.test(clean) && clean.split(' ').length <= 4) {
+      return true;
+    }
+
+    // Simple math expressions like "2+2", "what is 5 * 10"
+    if (/^(?:what is |calculate |solve )?(\d+\s*[\+\-\*\/x\^%]\s*\d+)$/i.test(clean)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Conversational AI Assistant with Mode Separation & Proportional Depth:
+   * - Simple / Casual queries: Answer simply, warmly, and briefly (1-2 sentences).
+   * - Research / News / Verification queries: Brief, structured, evidence-grounded explanations.
    */
   public static async generateChatResponse(
     message: string,
@@ -341,32 +372,36 @@ Respond in strict JSON format:
     mode: 'general' | 'news' | 'verification',
     contextSources: any[] = []
   ): Promise<{ content: string; sources: any[]; verdict?: Verdict; confidence?: number }> {
+    const isCasual = this.isConversationalOrCasual(message);
+
     let systemPrompt = '';
-    if (mode === 'general') {
-      systemPrompt = `You are a helpful, friendly, natural, and highly engaging conversational AI assistant.
-Tone: Warm, conversational, helpful, and natural (like ChatGPT / Claude / Gemini).
-Knowledge & Expertise:
-- You possess complete knowledge of world facts, science, coding, literature, and digital media forensics (AI images, Midjourney, DALL-E, Flux, Deepfake FaceSwaps, Sora/Kling synthetic video reels).
-- When asked about AI media, deepfakes, or image/video verification, provide clear, step-by-step forensic tips and analysis.
-- Answer questions directly with clear formatting, explanations, and insights.
-- Do NOT add robotic disclaimers unless discussing critical safety/scams.`;
+    if (isCasual) {
+      systemPrompt = `You are a helpful, friendly, natural conversational AI companion.
+- The user is asking a simple greeting or casual question (e.g. "how are you", "hi", "who are you").
+- Answer directly, warmly, and concisely in 1 or 2 complete sentences.
+- Do NOT bring up music albums, Wikipedia trivia, or long essays for simple greetings.`;
+    } else if (mode === 'general') {
+      systemPrompt = `You are an intelligent, helpful AI assistant.
+- Answer the user's question directly, clearly, and concisely.
+- For explanations or technical questions, provide a brief, well-structured answer with clean formatting.
+- Match the depth of your response to the complexity of the question without unnecessary fluff.`;
     } else if (mode === 'news') {
       systemPrompt = `You are FactCheck AI in "News Assistant Mode".
-Provide timely, objective, and well-researched summaries of current news events and media trends based on verifiable facts. Include source names, dates, and context.`;
+- Provide timely, objective, and brief summaries of current news topics based on verifiable facts.
+- Use clear bullet points and cite source names.`;
     } else {
       systemPrompt = `You are FactCheck AI in "News & Media Verification Mode".
-Your job is to objectively analyze claims, media, images, and videos.
-- Indicate whether statements/media are VERIFIED (REAL), FALSE (DEBUNKED), MISLEADING, AI-GENERATED (SYNTHETIC/DEEPFAKE), or UNVERIFIABLE.
-- Explain digital forensics (lighting physics, facial anatomy consistency, diffusion artifacts, temporal coherence in reels/videos).
-- Always provide structured Markdown headers, bullet points, and authoritative reasoning.`;
+- Objectively analyze claims, media, images, and videos.
+- State whether claims/media are VERIFIED (REAL), FALSE (DEBUNKED), MISLEADING, AI-GENERATED (SYNTHETIC/DEEPFAKE), or UNVERIFIABLE.
+- Explain digital forensics and cite evidence with structured Markdown headers and concise bullet points.`;
     }
 
-    // Fetch live search context for grounding
+    // Fetch live search context ONLY for non-casual factual/research queries
     let liveSearchContext = '';
     const searchSources: any[] = [...contextSources];
-    try {
-      const isSimpleGreeting = /^(hi+|hello+|hey+|yo|sup|greetings|hola|howdy)$/i.test(message.trim());
-      if (!isSimpleGreeting) {
+
+    if (!isCasual && mode !== 'general') {
+      try {
         const searchData = await this.searchLiveWebAndWikipedia(message);
         if (searchData.wikipedia) {
           searchSources.push({ name: `Wikipedia: ${searchData.wikipedia.title}`, url: searchData.wikipedia.url, reliabilityScore: 0.98 });
@@ -380,8 +415,17 @@ Your job is to objectively analyze claims, media, images, and videos.
             }
           });
         }
-      }
-    } catch {}
+      } catch {}
+    } else if (!isCasual && mode === 'general' && message.length > 15) {
+      // For general research questions in general mode, lightweight grounding
+      try {
+        const searchData = await this.searchLiveWebAndWikipedia(message);
+        if (searchData.wikipedia) {
+          searchSources.push({ name: `Wikipedia: ${searchData.wikipedia.title}`, url: searchData.wikipedia.url, reliabilityScore: 0.98 });
+          liveSearchContext += `\n\n[Reference Facts]: ${searchData.wikipedia.extract}`;
+        }
+      } catch {}
+    }
 
     // 1. Try Google Gemini API if valid key is set
     if (config.geminiApiKey) {
@@ -389,14 +433,18 @@ Your job is to objectively analyze claims, media, images, and videos.
         const model = config.geminiModel || 'gemini-3.6-flash';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.geminiApiKey}`;
 
+        const promptInstruction = liveSearchContext
+          ? `System Instruction: ${systemPrompt}\n\nReference facts:\n${liveSearchContext}`
+          : `System Instruction: ${systemPrompt}`;
+
         const contents: any[] = [];
         contents.push({
           role: 'user',
-          parts: [{ text: `System Instruction: ${systemPrompt}\n\nYou have access to real-time ground truth facts below. Synthesize a comprehensive, natural, detailed, and engaging response. Provide clear explanations, bullet points, and helpful insights.\n${liveSearchContext}` }],
+          parts: [{ text: promptInstruction }],
         });
         contents.push({
           role: 'model',
-          parts: [{ text: 'Understood. I will provide a rich, detailed, comprehensive, and helpful response.' }],
+          parts: [{ text: isCasual ? 'Got it! I will respond briefly and naturally.' : 'Understood. I will provide a clear, concise, and structured response.' }],
         });
 
         for (const h of history.slice(-6)) {
@@ -416,11 +464,11 @@ Your job is to objectively analyze claims, media, images, and videos.
           {
             contents,
             generationConfig: {
-              temperature: mode === 'general' ? 0.7 : mode === 'news' ? 0.4 : 0.2,
-              maxOutputTokens: 1500,
+              temperature: isCasual ? 0.7 : mode === 'general' ? 0.5 : 0.2,
+              maxOutputTokens: isCasual ? 350 : 1000,
             },
           },
-          { timeout: 12000 }
+          { timeout: 10000 }
         );
 
         const reply = res.data.candidates?.[0]?.content?.parts?.[0]?.text;
