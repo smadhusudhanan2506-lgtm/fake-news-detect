@@ -13,6 +13,7 @@ class MemoryStore {
   public claims: Map<string, any> = new Map();
   public factChecks: Map<string, any> = new Map();
   public news: Map<string, any> = new Map();
+  public tamilNews: Map<string, any> = new Map();
   public conversations: Map<string, any> = new Map();
   public moderationQueue: Map<string, any> = new Map();
   public sourceReliability: Map<string, any> = new Map();

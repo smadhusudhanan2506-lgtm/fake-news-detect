@@ -24,12 +24,27 @@ const RSS_FEEDS: RssFeedMapping[] = [
   { category: 'Entertainment', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=en-IN&gl=IN&ceid=IN:en' },
 ];
 
-let lastFetchTime = 0;
+const TAMIL_RSS_FEEDS: RssFeedMapping[] = [
+  { category: 'Tamil Nadu', url: 'https://news.google.com/rss/search?q=தமிழ்நாடு+செய்திகள்&hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Tamil Nadu', url: 'https://news.google.com/rss/search?q=சென்னை+செய்திகள்&hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'India', url: 'https://news.google.com/rss/headlines/section/topic/NATION?hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'World', url: 'https://news.google.com/rss/headlines/section/topic/WORLD?hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Technology', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Science', url: 'https://news.google.com/rss/search?q=அறிவியல்+செய்திகள்&hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Business', url: 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Health', url: 'https://news.google.com/rss/headlines/section/topic/HEALTH?hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Politics', url: 'https://news.google.com/rss/search?q=அரசியல்+செய்திகள்&hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Sports', url: 'https://news.google.com/rss/headlines/section/topic/SPORTS?hl=ta&gl=IN&ceid=IN:ta' },
+  { category: 'Entertainment', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ta&gl=IN&ceid=IN:ta' },
+];
+
+let lastFetchTimeEn = 0;
+let lastFetchTimeTa = 0;
 const CACHE_DURATION_MS = 3 * 60 * 1000; // 3 minutes cache
 
 export class NewsService {
   /**
-   * List news with filtering, live search ingestion, and pagination
+   * List news with filtering, live search ingestion, and pagination (supports 'en' and 'ta')
    */
   public static async getNews(params: {
     category?: NewsCategory;
@@ -37,18 +52,20 @@ export class NewsService {
     trendingOnly?: boolean;
     limit?: number;
     page?: number;
+    lang?: 'en' | 'ta';
   }) {
-    const { category, search, trendingOnly, limit = 25, page = 1 } = params;
+    const { category, search, trendingOnly, limit = 25, page = 1, lang = 'en' } = params;
 
-    // 1. If user provided a specific search query, execute real-time live search
+    // 1. Live search or background ingestion
     if (search && search.trim().length > 1) {
-      await this.searchLiveNews(search.trim(), category);
+      await this.searchLiveNews(search.trim(), category, lang);
     } else {
-      // Background live news refresh
-      await this.refreshLiveNewsIfNeeded(category);
+      await this.refreshLiveNewsIfNeeded(category, lang);
     }
 
-    if (isMongoConnected) {
+    const store = lang === 'ta' ? memoryStore.tamilNews : memoryStore.news;
+
+    if (isMongoConnected && lang === 'en') {
       try {
         const query: any = {};
         if (category) query.category = category;
@@ -73,8 +90,8 @@ export class NewsService {
       }
     }
 
-    // Memory Store
-    let items = Array.from(memoryStore.news.values());
+    // Memory Store (Language specific)
+    let items = Array.from(store.values());
     if (category) items = items.filter((n) => n.category === category);
     if (trendingOnly) items = items.filter((n) => n.isTrending);
     if (search) {
@@ -99,9 +116,12 @@ export class NewsService {
   /**
    * Real-time live search via Google News Search RSS
    */
-  public static async searchLiveNews(query: string, targetCategory?: NewsCategory): Promise<void> {
+  public static async searchLiveNews(query: string, targetCategory?: NewsCategory, lang: 'en' | 'ta' = 'en'): Promise<void> {
     try {
-      const searchUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
+      const searchUrl = lang === 'ta'
+        ? `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ta&gl=IN&ceid=IN:ta`
+        : `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
+
       const res = await axios.get(searchUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -113,9 +133,10 @@ export class NewsService {
       const category: NewsCategory = targetCategory || (query.toLowerCase().includes('tamil') || query.toLowerCase().includes('chennai') ? 'Tamil Nadu' : 'India');
       const parsedItems = this.parseRssXml(res.data, category);
 
+      const store = lang === 'ta' ? memoryStore.tamilNews : memoryStore.news;
       for (const item of parsedItems) {
-        memoryStore.news.set(item._id, item);
-        if (isMongoConnected) {
+        store.set(item._id, item);
+        if (isMongoConnected && lang === 'en') {
           try {
             const { _id, ...cleanItem } = item;
             await News.findOneAndUpdate({ sourceUrl: item.sourceUrl }, cleanItem, { upsert: true });
@@ -128,67 +149,73 @@ export class NewsService {
   }
 
   /**
-   * Fetch and ingest live news from NewsAPI and verified RSS feeds
+   * Fetch and ingest live news from NewsAPI and verified RSS feeds (supports English and Tamil)
    */
-  public static async refreshLiveNewsIfNeeded(targetCategory?: NewsCategory): Promise<void> {
+  public static async refreshLiveNewsIfNeeded(targetCategory?: NewsCategory, lang: 'en' | 'ta' = 'en'): Promise<void> {
     const now = Date.now();
-    if (now - lastFetchTime < CACHE_DURATION_MS && memoryStore.news.size > 15) {
+    const store = lang === 'ta' ? memoryStore.tamilNews : memoryStore.news;
+    const lastFetch = lang === 'ta' ? lastFetchTimeTa : lastFetchTimeEn;
+
+    if (now - lastFetch < CACHE_DURATION_MS && store.size > 8) {
       return;
     }
 
     try {
-      // 1. Ingest via NewsAPI if configured
-      if (config.newsApiKey) {
-        try {
-          const categoryParam = targetCategory && targetCategory !== 'Tamil Nadu' ? `&category=${targetCategory.toLowerCase()}` : '';
-          const res = await axios.get(
-            `https://newsapi.org/v2/top-headlines?country=in${categoryParam}&pageSize=15&apiKey=${config.newsApiKey}`,
-            { timeout: 6000 }
-          );
+      if (lang === 'en') {
+        // 1. Ingest English NewsAPI if configured
+        if (config.newsApiKey) {
+          try {
+            const categoryParam = targetCategory && targetCategory !== 'Tamil Nadu' ? `&category=${targetCategory.toLowerCase()}` : '';
+            const res = await axios.get(
+              `https://newsapi.org/v2/top-headlines?country=in${categoryParam}&pageSize=15&apiKey=${config.newsApiKey}`,
+              { timeout: 6000 }
+            );
 
-          if (res.data?.articles) {
-            for (const art of res.data.articles) {
-              if (art.title && art.url && !art.title.includes('[Removed]')) {
-                const safeId = `newsapi_${Buffer.from(art.url).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 24)}`;
-                const cleanTitle = this.cleanHtmlText(art.title);
-                const cleanDesc = art.description
-                  ? this.cleanHtmlText(art.description)
-                  : `${cleanTitle}. Live report by ${art.source?.name || 'Verified Wire'}.`;
+            if (res.data?.articles) {
+              for (const art of res.data.articles) {
+                if (art.title && art.url && !art.title.includes('[Removed]')) {
+                  const safeId = `newsapi_${Buffer.from(art.url).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 24)}`;
+                  const cleanTitle = this.cleanHtmlText(art.title);
+                  const cleanDesc = art.description
+                    ? this.cleanHtmlText(art.description)
+                    : `${cleanTitle}. Live report by ${art.source?.name || 'Verified Wire'}.`;
 
-                const item: any = {
-                  _id: safeId,
-                  title: cleanTitle,
-                  description: cleanDesc,
-                  source: art.source?.name || 'Verified Wire',
-                  sourceUrl: art.url,
-                  category: targetCategory || 'India',
-                  reliabilityScore: 0.95,
-                  isVerified: true,
-                  isTrending: true,
-                  summaryBulletPoints: [cleanDesc],
-                  publishedAt: new Date(art.publishedAt || new Date()),
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                };
-                memoryStore.news.set(item._id, item);
-                if (isMongoConnected) {
-                  try {
-                    const { _id, ...cleanItem } = item;
-                    await News.findOneAndUpdate({ sourceUrl: item.sourceUrl }, cleanItem, { upsert: true });
-                  } catch (_) {}
+                  const item: any = {
+                    _id: safeId,
+                    title: cleanTitle,
+                    description: cleanDesc,
+                    source: art.source?.name || 'Verified Wire',
+                    sourceUrl: art.url,
+                    category: targetCategory || 'India',
+                    reliabilityScore: 0.95,
+                    isVerified: true,
+                    isTrending: true,
+                    summaryBulletPoints: [cleanDesc],
+                    publishedAt: new Date(art.publishedAt || new Date()),
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                  };
+                  store.set(item._id, item);
+                  if (isMongoConnected) {
+                    try {
+                      const { _id, ...cleanItem } = item;
+                      await News.findOneAndUpdate({ sourceUrl: item.sourceUrl }, cleanItem, { upsert: true });
+                    } catch (_) {}
+                  }
                 }
               }
             }
+          } catch (err: any) {
+            logger.warn(`NewsAPI fetch error: ${err.message}. Relying on verified RSS wire feeds.`);
           }
-        } catch (err: any) {
-          logger.warn(`NewsAPI fetch error: ${err.message}. Relying on verified RSS wire feeds.`);
         }
       }
 
-      // 2. Ingest via Verified RSS feeds
+      // 2. Ingest RSS feeds (English or Tamil)
+      const feedList = lang === 'ta' ? TAMIL_RSS_FEEDS : RSS_FEEDS;
       const feedsToFetch = targetCategory
-        ? RSS_FEEDS.filter((f) => f.category === targetCategory)
-        : RSS_FEEDS;
+        ? feedList.filter((f) => f.category === targetCategory)
+        : feedList;
 
       for (const feed of feedsToFetch) {
         try {
@@ -202,8 +229,8 @@ export class NewsService {
 
           const parsedItems = this.parseRssXml(res.data, feed.category);
           for (const item of parsedItems) {
-            memoryStore.news.set(item._id, item);
-            if (isMongoConnected) {
+            store.set(item._id, item);
+            if (isMongoConnected && lang === 'en') {
               try {
                 const { _id, ...cleanItem } = item;
                 await News.findOneAndUpdate({ sourceUrl: item.sourceUrl }, cleanItem, { upsert: true });
@@ -211,14 +238,18 @@ export class NewsService {
             }
           }
         } catch (err: any) {
-          logger.warn(`RSS fetch skipped for ${feed.category}: ${err.message}`);
+          logger.warn(`RSS fetch skipped for ${feed.category} (${lang}): ${err.message}`);
         }
       }
 
-      lastFetchTime = now;
-      logger.info(`Live news updated (${memoryStore.news.size} stories available).`);
+      if (lang === 'ta') {
+        lastFetchTimeTa = now;
+      } else {
+        lastFetchTimeEn = now;
+      }
+      logger.info(`Live news updated for [${lang}] (${store.size} stories available).`);
     } catch (err: any) {
-      logger.warn(`Failed to refresh live news: ${err.message}`);
+      logger.warn(`Failed to refresh live news [${lang}]: ${err.message}`);
     }
   }
 
@@ -299,16 +330,16 @@ export class NewsService {
   }
 
   /**
-   * Get personalized daily news briefing
+   * Get personalized daily news briefing (supports English and Tamil)
    */
-  public static async getDailyBriefing(interests?: string[]) {
+  public static async getDailyBriefing(interests?: string[], lang: 'en' | 'ta' = 'en') {
     // Ensure live feeds are fresh
-    await this.refreshLiveNewsIfNeeded();
+    await this.refreshLiveNewsIfNeeded(undefined, lang);
 
-    const res = await this.getNews({ limit: 8 });
+    const res = await this.getNews({ limit: 8, lang });
     const selected = res.items.slice(0, 5);
 
-    const greeting = this.getGreetingByTime();
+    const greeting = lang === 'ta' ? this.getTamilGreetingByTime() : this.getGreetingByTime();
     const briefingSummary = selected.map((item) => ({
       id: item._id,
       title: item.title,
@@ -319,10 +350,14 @@ export class NewsService {
       publishedAt: item.publishedAt,
     }));
 
+    const message = lang === 'ta'
+      ? `${greeting}! உங்களுக்கான இன்றைய முக்கிய 5 சரிபார்க்கப்பட்ட செய்திகள் இதோ.`
+      : `${greeting}! Here are today's 5 essential verified stories curated for your interests.`;
+
     return {
       greeting,
-      message: `${greeting}! Here are today's 5 essential verified stories curated for your interests.`,
-      date: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }),
+      message,
+      date: new Date().toLocaleDateString(lang === 'ta' ? 'ta-IN' : 'en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }),
       stories: briefingSummary,
     };
   }
@@ -332,5 +367,12 @@ export class NewsService {
     if (hour < 12) return 'Good Morning';
     if (hour < 17) return 'Good Afternoon';
     return 'Good Evening';
+  }
+
+  private static getTamilGreetingByTime(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'இனிய காலை வணக்கம்';
+    if (hour < 17) return 'இனிய மதிய வணக்கம்';
+    return 'இனிய மாலை வணக்கம்';
   }
 }

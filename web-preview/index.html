@@ -402,8 +402,22 @@
       <section class="screen-view" id="screen-news">
         <div class="screen-inner">
           <div class="screen-top-bar">
-            <h2>Verified News Hub</h2>
-            <button class="icon-circle-btn" id="btn-refresh-news"><i class="fa-solid fa-rotate"></i></button>
+            <div>
+              <h2 id="news-title">Verified News Hub</h2>
+              <span class="text-muted" style="font-size: 12px;" id="news-subtitle">Live verified breaking news from top sources</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <!-- Language Selector ONLY for News -->
+              <div class="news-lang-toggle" id="news-lang-toggle" style="display: flex; background: var(--c-surface-v); border: 1px solid var(--c-border); border-radius: 20px; padding: 2px; gap: 2px;">
+                <button class="news-lang-btn active" data-news-lang="en" id="btn-news-lang-en" style="border: none; background: var(--primary); color: white; border-radius: 16px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                  <i class="fa-solid fa-globe"></i> English
+                </button>
+                <button class="news-lang-btn" data-news-lang="ta" id="btn-news-lang-ta" style="border: none; background: transparent; color: var(--c-text-sub); border-radius: 16px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                  தமிழ் (Tamil)
+                </button>
+              </div>
+              <button class="icon-circle-btn" id="btn-refresh-news" title="Refresh News"><i class="fa-solid fa-rotate"></i></button>
+            </div>
           </div>
 
           <div class="news-search-bar">
@@ -771,6 +785,6 @@
   </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

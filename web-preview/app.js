@@ -1102,14 +1102,125 @@ async function showDailyBriefingModal() {
 
 // ══════════════ NEWS HUB ══════════════
 let currentNewsCategory = 'All';
+let currentNewsLang = 'en';
+
+const NEWS_CATEGORIES_EN = [
+  { label: 'All', value: 'All' },
+  { label: '🔥 Tamil Nadu', value: 'Tamil Nadu' },
+  { label: 'India', value: 'India' },
+  { label: 'World', value: 'World' },
+  { label: 'Technology', value: 'Technology' },
+  { label: 'Science', value: 'Science' },
+  { label: 'Health', value: 'Health' },
+  { label: 'Politics', value: 'Politics' },
+  { label: 'Business', value: 'Business' },
+];
+
+const NEWS_CATEGORIES_TA = [
+  { label: 'அனைத்தும்', value: 'All' },
+  { label: '🔥 தமிழ்நாடு', value: 'Tamil Nadu' },
+  { label: 'இந்தியா', value: 'India' },
+  { label: 'உலகம்', value: 'World' },
+  { label: 'தொழில்நுட்பம்', value: 'Technology' },
+  { label: 'அறிவியல்', value: 'Science' },
+  { label: 'சுகாதாரம்', value: 'Health' },
+  { label: 'அரசியல்', value: 'Politics' },
+  { label: 'வணிகம்', value: 'Business' },
+  { label: 'விளையாட்டு', value: 'Sports' },
+  { label: 'சினிமா', value: 'Entertainment' },
+];
+
+function setupCategoryChips() {
+  renderCategoryChips();
+  setupNewsLanguageToggle();
+}
+
+function renderCategoryChips() {
+  const container = document.getElementById('news-categories-chips');
+  if (!container) return;
+
+  const categories = currentNewsLang === 'ta' ? NEWS_CATEGORIES_TA : NEWS_CATEGORIES_EN;
+  container.innerHTML = '';
+
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = `cat-chip ${cat.value === currentNewsCategory ? 'active' : ''}`;
+    btn.setAttribute('data-category', cat.value);
+    btn.innerText = cat.label;
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentNewsCategory = cat.value;
+      const searchVal = document.getElementById('news-search-input')?.value.trim() || '';
+      loadNewsHub(currentNewsCategory, searchVal);
+    });
+    container.appendChild(btn);
+  });
+}
+
+function setupNewsLanguageToggle() {
+  const btnEn = document.getElementById('btn-news-lang-en');
+  const btnTa = document.getElementById('btn-news-lang-ta');
+  const newsTitle = document.getElementById('news-title');
+  const newsSubtitle = document.getElementById('news-subtitle');
+  const newsSearchInput = document.getElementById('news-search-input');
+
+  const setLanguage = (lang) => {
+    currentNewsLang = lang;
+    currentNewsCategory = 'All';
+
+    if (lang === 'ta') {
+      btnTa?.classList.add('active');
+      btnEn?.classList.remove('active');
+      if (btnTa) {
+        btnTa.style.background = 'var(--primary)';
+        btnTa.style.color = 'white';
+      }
+      if (btnEn) {
+        btnEn.style.background = 'transparent';
+        btnEn.style.color = 'var(--c-text-sub)';
+      }
+
+      if (newsTitle) newsTitle.innerText = 'சரிபார்க்கப்பட்ட செய்திகள் (Tamil News)';
+      if (newsSubtitle) newsSubtitle.innerText = 'நம்பகமான ஊடகங்களின் சமீபத்திய தமிழ் செய்திகள்';
+      if (newsSearchInput) newsSearchInput.placeholder = 'செய்திகளைத் தேடுங்கள் (எ.கா. தமிழ்நாடு, தேர்தல், பட்ஜெட்)...';
+      showToast('செய்திகள் தமிழில் மாற்றப்பட்டன (News switched to Tamil)', 'success');
+    } else {
+      btnEn?.classList.add('active');
+      btnTa?.classList.remove('active');
+      if (btnEn) {
+        btnEn.style.background = 'var(--primary)';
+        btnEn.style.color = 'white';
+      }
+      if (btnTa) {
+        btnTa.style.background = 'transparent';
+        btnTa.style.color = 'var(--c-text-sub)';
+      }
+
+      if (newsTitle) newsTitle.innerText = 'Verified News Hub';
+      if (newsSubtitle) newsSubtitle.innerText = 'Live verified breaking news from top sources';
+      if (newsSearchInput) newsSearchInput.placeholder = 'Search verified news & fact-checks...';
+      showToast('News language switched to English', 'info');
+    }
+
+    renderCategoryChips();
+    loadNewsHub('All', '');
+  };
+
+  btnEn?.addEventListener('click', () => setLanguage('en'));
+  btnTa?.addEventListener('click', () => setLanguage('ta'));
+}
 
 async function loadNewsHub(category = 'All', search = '') {
   currentNewsCategory = category;
   const list = document.getElementById('news-articles-list');
-  list.innerHTML = '<p style="color: var(--c-text-sub); padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Ingesting live verified stories...</p>';
+  const loadingText = currentNewsLang === 'ta'
+    ? '<p style="color: var(--c-text-sub); padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> நேரலை தமிழ் செய்திகள் பெறப்படுகின்றன...</p>'
+    : '<p style="color: var(--c-text-sub); padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Ingesting live verified stories...</p>';
+  list.innerHTML = loadingText;
 
   try {
-    let url = `${API_BASE}/news?`;
+    let url = `${API_BASE}/news?lang=${currentNewsLang}&`;
     const params = [];
     if (category && category !== 'All') params.push(`category=${encodeURIComponent(category)}`);
     if (search && search.trim()) params.push(`search=${encodeURIComponent(search.trim())}`);
@@ -1121,7 +1232,9 @@ async function loadNewsHub(category = 'All', search = '') {
 
     list.innerHTML = '';
     if (items.length === 0) {
-      list.innerHTML = '<p style="color: var(--c-text-sub); padding: 20px;">No stories found. Try another search query or category.</p>';
+      list.innerHTML = currentNewsLang === 'ta'
+        ? '<p style="color: var(--c-text-sub); padding: 20px;">செய்திகள் எதுவும் கிடைக்கவில்லை. வேறு தேடல் சொல்லை முயற்சிக்கவும்.</p>'
+        : '<p style="color: var(--c-text-sub); padding: 20px;">No stories found. Try another search query or category.</p>';
       return;
     }
 
@@ -1130,12 +1243,17 @@ async function loadNewsHub(category = 'All', search = '') {
       card.className = 'result-section-box';
       card.style.cssText = 'padding: 16px; margin-bottom: 12px; transition: border-color 0.2s;';
 
-      const timeAgo = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent';
+      const timeAgo = item.publishedAt
+        ? new Date(item.publishedAt).toLocaleDateString(currentNewsLang === 'ta' ? 'ta-IN' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : 'Recent';
+
+      const verifiedBadge = currentNewsLang === 'ta' ? 'உறுதிசெய்யப்பட்டது' : 'VERIFIED';
+      const readMoreText = currentNewsLang === 'ta' ? 'முழு செய்தியைப் படிக்க ↗' : 'Read Full Article ↗';
 
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:8px;">
           <span style="color:var(--verified-green); font-weight:700; background:rgba(16,185,129,0.1); padding:2px 8px; border-radius:4px;">
-            <i class="fa-solid fa-circle-check"></i> VERIFIED • ${item.category}
+            <i class="fa-solid fa-circle-check"></i> ${verifiedBadge} • ${item.category}
           </span>
           <span style="color:var(--verified-green); font-weight:700;">
             ${Math.round((item.reliabilityScore || 0.95) * 100)}% Trust
@@ -1146,14 +1264,16 @@ async function loadNewsHub(category = 'All', search = '') {
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; border-top:1px solid var(--c-border); padding-top:8px;">
           <span style="color:var(--c-text-sub);"><i class="fa-solid fa-newspaper"></i> ${item.source} • ${timeAgo}</span>
           <a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer" style="color:var(--primary-light); text-decoration:none; font-weight:600;">
-            Read Full Article ↗
+            ${readMoreText}
           </a>
         </div>
       `;
       list.appendChild(card);
     });
   } catch {
-    list.innerHTML = '<p style="color: var(--c-text-sub); padding: 20px;">Could not load news at this time.</p>';
+    list.innerHTML = currentNewsLang === 'ta'
+      ? '<p style="color: var(--c-text-sub); padding: 20px;">தற்போது செய்திகளைப் பெற முடியவில்லை.</p>'
+      : '<p style="color: var(--c-text-sub); padding: 20px;">Could not load news at this time.</p>';
   }
 }
 
