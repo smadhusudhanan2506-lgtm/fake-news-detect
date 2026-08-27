@@ -290,41 +290,75 @@ async function loadUserData() {
 }
 
 function updateUserUI(user) {
-  if (!user) return;
-  const name = user.name || 'User';
-  const email = user.email || 'user@example.com';
-  const role = user.role || 'user';
-  const initial = (name[0] || 'U').toUpperCase();
+  const btnAuth = document.getElementById('btn-open-auth-modal');
 
-  // Header
-  const headerName = document.getElementById('header-user-name');
-  if (headerName) headerName.innerText = name;
-  const headerRole = document.getElementById('header-user-role');
-  if (headerRole) headerRole.innerText = role.toUpperCase();
-  const headerAvatar = document.getElementById('header-avatar');
-  if (headerAvatar) headerAvatar.innerText = initial;
+  if (user) {
+    const name = user.name || 'User';
+    const email = user.email || 'user@example.com';
+    const role = user.role || 'user';
+    const initial = (name[0] || 'U').toUpperCase();
 
-  // Home Greeting
-  const userDisplayName = document.getElementById('user-display-name');
-  if (userDisplayName) userDisplayName.innerText = name;
+    // Top Header Button -> Show Sign Out
+    if (btnAuth) {
+      btnAuth.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> <span>Sign Out</span>';
+      btnAuth.className = 'btn-auth-action btn-auth-signout';
+      btnAuth.title = 'Sign Out of Account';
+    }
 
-  // Sidebar
-  const sidebarName = document.getElementById('sidebar-user-name');
-  if (sidebarName) sidebarName.innerText = name;
-  const sidebarRole = document.getElementById('sidebar-user-role');
-  if (sidebarRole) sidebarRole.innerText = role.charAt(0).toUpperCase() + role.slice(1);
-  const sidebarAvatar = document.getElementById('sidebar-avatar');
-  if (sidebarAvatar) sidebarAvatar.innerText = initial;
+    // Header User Badge
+    const headerName = document.getElementById('header-user-name');
+    if (headerName) headerName.innerText = name;
+    const headerRole = document.getElementById('header-user-role');
+    if (headerRole) headerRole.innerText = role.toUpperCase();
+    const headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) headerAvatar.innerText = initial;
 
-  // Profile Screen
-  const profileName = document.getElementById('profile-name');
-  if (profileName) profileName.innerText = name;
-  const profileEmail = document.getElementById('profile-email');
-  if (profileEmail) profileEmail.innerText = email;
-  const profileRole = document.getElementById('profile-role-badge');
-  if (profileRole) profileRole.innerText = role.toUpperCase();
-  const profileAvatar = document.getElementById('profile-avatar-initial');
-  if (profileAvatar) profileAvatar.innerText = initial;
+    // Home Greeting
+    const userDisplayName = document.getElementById('user-display-name');
+    if (userDisplayName) userDisplayName.innerText = name;
+
+    // Sidebar
+    const sidebarName = document.getElementById('sidebar-user-name');
+    if (sidebarName) sidebarName.innerText = name;
+    const sidebarRole = document.getElementById('sidebar-user-role');
+    if (sidebarRole) sidebarRole.innerText = role.charAt(0).toUpperCase() + role.slice(1);
+    const sidebarAvatar = document.getElementById('sidebar-avatar');
+    if (sidebarAvatar) sidebarAvatar.innerText = initial;
+
+    // Profile Screen
+    const profileName = document.getElementById('profile-name');
+    if (profileName) profileName.innerText = name;
+    const profileEmail = document.getElementById('profile-email');
+    if (profileEmail) profileEmail.innerText = email;
+    const profileRole = document.getElementById('profile-role-badge');
+    if (profileRole) profileRole.innerText = role.toUpperCase();
+    const profileAvatar = document.getElementById('profile-avatar-initial');
+    if (profileAvatar) profileAvatar.innerText = initial;
+  } else {
+    // Logged Out State
+    if (btnAuth) {
+      btnAuth.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> <span>Sign In</span>';
+      btnAuth.className = 'btn-auth-action';
+      btnAuth.title = 'Sign In or Register';
+    }
+
+    const headerName = document.getElementById('header-user-name');
+    if (headerName) headerName.innerText = 'Guest';
+    const headerRole = document.getElementById('header-user-role');
+    if (headerRole) headerRole.innerText = 'GUEST';
+    const headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) headerAvatar.innerText = 'G';
+
+    const userDisplayName = document.getElementById('user-display-name');
+    if (userDisplayName) userDisplayName.innerText = 'Guest';
+
+    const sidebarName = document.getElementById('sidebar-user-name');
+    if (sidebarName) sidebarName.innerText = 'Guest';
+    const sidebarRole = document.getElementById('sidebar-user-role');
+    if (sidebarRole) sidebarRole.innerText = 'Not Signed In';
+    const sidebarAvatar = document.getElementById('sidebar-avatar');
+    if (sidebarAvatar) sidebarAvatar.innerText = 'G';
+  }
 }
 
 function setupAuthModal() {
@@ -341,29 +375,168 @@ function setupAuthModal() {
   const btnProfileSwitch = document.getElementById('btn-profile-switch-account');
   const btnProfileLogout = document.getElementById('btn-profile-logout');
 
-  const openModal = (tab = 'login') => {
-    if (!authModal) return;
-    authModal.classList.remove('hidden');
+  // Dedicated Auth Screen Elements
+  const pTabLogin = document.getElementById('pauth-tab-login');
+  const pTabRegister = document.getElementById('pauth-tab-register');
+  const formPageLogin = document.getElementById('form-page-login');
+  const formPageRegister = document.getElementById('form-page-register');
+  const linkPageToRegister = document.getElementById('link-page-to-register');
+  const linkPageToLogin = document.getElementById('link-page-to-login');
+
+  const switchPageAuthTab = (tab = 'login') => {
     if (tab === 'login') {
-      if (tabLogin) tabLogin.classList.add('active');
-      if (tabRegister) tabRegister.classList.remove('active');
-      if (formLogin) formLogin.classList.remove('hidden');
-      if (formRegister) formRegister.classList.add('hidden');
+      pTabLogin?.classList.add('active');
+      pTabRegister?.classList.remove('active');
+      formPageLogin?.classList.remove('hidden');
+      formPageRegister?.classList.add('hidden');
     } else {
-      if (tabRegister) tabRegister.classList.add('active');
-      if (tabLogin) tabLogin.classList.remove('active');
-      if (formRegister) formRegister.classList.remove('hidden');
-      if (formLogin) formLogin.classList.add('hidden');
+      pTabRegister?.classList.add('active');
+      pTabLogin?.classList.remove('active');
+      formPageRegister?.classList.remove('hidden');
+      formPageLogin?.classList.add('hidden');
     }
+  };
+
+  if (pTabLogin) pTabLogin.addEventListener('click', () => switchPageAuthTab('login'));
+  if (pTabRegister) pTabRegister.addEventListener('click', () => switchPageAuthTab('register'));
+  if (linkPageToRegister) linkPageToRegister.addEventListener('click', (e) => { e.preventDefault(); switchPageAuthTab('register'); });
+  if (linkPageToLogin) linkPageToLogin.addEventListener('click', (e) => { e.preventDefault(); switchPageAuthTab('login'); });
+
+  // Handle Dedicated Page Login Form
+  if (formPageLogin) {
+    formPageLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('plogin-email').value.trim();
+      const password = document.getElementById('plogin-password').value;
+      const submitBtn = document.getElementById('btn-page-submit-login');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing In to MongoDB...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.data?.token) {
+          currentToken = data.data.token;
+          currentUser = data.data.user;
+          currentRole = currentUser.role || 'user';
+
+          localStorage.setItem('fc_token', currentToken);
+          localStorage.setItem('fc_user', JSON.stringify(currentUser));
+
+          updateUserUI(currentUser);
+          showToast(`Welcome back, ${currentUser.name}! 👋`, 'success');
+          switchScreen('home');
+
+          await loadHistory();
+          await loadHomeDashboard();
+          if (currentRole === 'moderator' || currentRole === 'admin') {
+            loadModeratorDashboard();
+          }
+        } else {
+          showToast(data.error?.message || 'Login failed. Invalid email or password.', 'warning');
+        }
+      } catch {
+        showToast('Could not connect to database server. Please try again.', 'warning');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In to Account';
+        }
+      }
+    });
+  }
+
+  // Handle Dedicated Page Register Form
+  if (formPageRegister) {
+    formPageRegister.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('preg-name').value.trim();
+      const email = document.getElementById('preg-email').value.trim();
+      const password = document.getElementById('preg-password').value;
+      const role = document.getElementById('preg-role').value;
+      const submitBtn = document.getElementById('btn-page-submit-register');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering in MongoDB Atlas...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.data?.token) {
+          currentToken = data.data.token;
+          currentUser = data.data.user;
+          currentRole = currentUser.role || 'user';
+
+          localStorage.setItem('fc_token', currentToken);
+          localStorage.setItem('fc_user', JSON.stringify(currentUser));
+
+          updateUserUI(currentUser);
+          showToast(`Account registered in MongoDB! Welcome, ${name}! 🎉`, 'success');
+          switchScreen('home');
+
+          await loadHistory();
+          await loadHomeDashboard();
+          if (currentRole === 'moderator' || currentRole === 'admin') {
+            loadModeratorDashboard();
+          }
+        } else {
+          showToast(data.error?.message || 'Registration failed. Email may already be in use.', 'warning');
+        }
+      } catch {
+        showToast('Could not connect to database server. Please try again.', 'warning');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register in MongoDB Atlas';
+        }
+      }
+    });
+  }
+
+  // Header Sign In / Sign Out Click Handler
+  if (btnOpenAuth) {
+    btnOpenAuth.addEventListener('click', () => {
+      if (currentUser && currentToken) {
+        // Perform Sign Out
+        localStorage.removeItem('fc_token');
+        localStorage.removeItem('fc_user');
+        currentToken = '';
+        currentUser = null;
+        updateUserUI(null);
+        showToast('Signed out successfully.', 'info');
+        switchScreen('auth');
+      } else {
+        switchScreen('auth');
+      }
+    });
+  }
+
+  const openModal = (tab = 'login') => {
+    switchScreen('auth');
+    switchPageAuthTab(tab);
   };
 
   const closeModal = () => {
     if (authModal) authModal.classList.add('hidden');
   };
 
-  if (btnOpenAuth) btnOpenAuth.addEventListener('click', () => openModal('login'));
   if (headerUserBadge) headerUserBadge.addEventListener('click', () => switchScreen('profile'));
-  if (btnProfileSwitch) btnProfileSwitch.addEventListener('click', () => openModal('login'));
+  if (btnProfileSwitch) btnProfileSwitch.addEventListener('click', () => { switchScreen('auth'); switchPageAuthTab('login'); });
   if (btnCloseAuth) btnCloseAuth.addEventListener('click', closeModal);
 
   if (tabLogin) tabLogin.addEventListener('click', () => openModal('login'));
@@ -377,7 +550,7 @@ function setupAuthModal() {
     });
   }
 
-  // Handle Login Form Submit (MongoDB)
+  // Handle Modal Login Form Submit (MongoDB)
   if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -409,6 +582,7 @@ function setupAuthModal() {
           updateUserUI(currentUser);
           closeModal();
           showToast(`Welcome back, ${currentUser.name}! 👋`, 'success');
+          switchScreen('home');
 
           await loadHistory();
           await loadHomeDashboard();
@@ -418,7 +592,7 @@ function setupAuthModal() {
         } else {
           showToast(data.error?.message || 'Login failed. Invalid email or password.', 'warning');
         }
-      } catch (err) {
+      } catch {
         showToast('Could not connect to server. Please try again.', 'warning');
       } finally {
         if (submitBtn) {
@@ -429,7 +603,7 @@ function setupAuthModal() {
     });
   }
 
-  // Handle Register Form Submit (MongoDB)
+  // Handle Modal Register Form Submit (MongoDB)
   if (formRegister) {
     formRegister.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -463,6 +637,7 @@ function setupAuthModal() {
           updateUserUI(currentUser);
           closeModal();
           showToast(`Account registered in MongoDB! Welcome, ${name}! 🎉`, 'success');
+          switchScreen('home');
 
           await loadHistory();
           await loadHomeDashboard();
@@ -472,7 +647,7 @@ function setupAuthModal() {
         } else {
           showToast(data.error?.message || 'Registration failed. Email may already be in use.', 'warning');
         }
-      } catch (err) {
+      } catch {
         showToast('Could not connect to server. Please try again.', 'warning');
       } finally {
         if (submitBtn) {
@@ -483,16 +658,16 @@ function setupAuthModal() {
     });
   }
 
-  // Handle Logout
+  // Handle Profile Logout
   if (btnProfileLogout) {
     btnProfileLogout.addEventListener('click', () => {
       localStorage.removeItem('fc_token');
       localStorage.removeItem('fc_user');
       currentToken = '';
       currentUser = null;
+      updateUserUI(null);
       showToast('Logged out successfully.', 'info');
-      loadUserData();
-      openModal('login');
+      switchScreen('auth');
     });
   }
 }
